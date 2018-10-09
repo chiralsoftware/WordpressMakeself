@@ -80,9 +80,9 @@ echo "echo Wordpress backup of $(date)" >> $WORK_DIR/install.sh
 echo "echo" >> $WORK_DIR/install.sh
 echo "rm -rf $SCRIPTPATH" >> $WORK_DIR/install.sh
 echo "echo Replacing database" >> $WORK_DIR/install.sh
-echo "brotli -d ./database-$BACKUP_DATE.sql.br | mysql -u $DB_USER -p$DB_PASSWORD --host=$DB_HOST " >> $WORK_DIR/install.sh
+echo "brotli --decompress --input ./database-$BACKUP_DATE.sql.br | mysql -u $DB_USER -p$DB_PASSWORD --host=$DB_HOST " >> $WORK_DIR/install.sh
 echo "echo Replacing HTML" >> $WORK_DIR/install.sh
-echo "brotli -d < ./html-$BACKUP_DATE.tar.br  | tar -x -f - --directory=$INSTALLPATH" >> $WORK_DIR/install.sh
+echo "brotli --decompress < ./html-$BACKUP_DATE.tar.br  | tar -x -f - --directory=$INSTALLPATH" >> $WORK_DIR/install.sh
 echo "echo Performing chown" >> $WORK_DIR/install.sh
 echo "chown -R www-data:www-data $SCRIPTPATH" >> $WORK_DIR/install.sh
 echo 'a2query >/dev/null 2>&1 || { echo >&2 "a2query not found, so apache installation is incomplete"; exit 1; }' >> $WORK_DIR/install.sh
