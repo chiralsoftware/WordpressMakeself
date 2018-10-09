@@ -49,10 +49,12 @@ DB_NAME=$(trim ${LINES[3]})
 
 mysql -u $DB_USER -p$DB_PASSWORD --host=$DB_HOST $DB_NAME -e ";" || { echo >&2 "could not connect to mysql"; exit 1; }
 
+SITE_NAME=$(mysql -B --skip-column-names -u $DB_USER -p$DB_PASSWORD --host=$DB_HOST $DB_NAME -e "select option_value from wp_options where option_name = 'blogname';"  | sed -e 's/ /-/g')
+
 echo mysql connection works
 
 mysqldump -u $DB_USER -p$DB_PASSWORD --host=$DB_HOST --add-drop-database --databases $DB_NAME | \
-    brotli -c --quality=8 > $WORK_DIR/database-$BACKUP_DATE.sql.br \
+    brotli -c --quality=9 > $WORK_DIR/database-$BACKUP_DATE.sql.br \
     || { echo >&2 "mysqldump command failed"; exit 1; }
 
 #cp $WORK_DIR/database-$BACKUP_DATE.sql.br /tmp
@@ -62,7 +64,7 @@ mysqldump -u $DB_USER -p$DB_PASSWORD --host=$DB_HOST --add-drop-database --datab
 SITE=$(basename $SCRIPTPATH)
 
 cd $SCRIPTPATH/..
-tar --exclude-backups --exclude=.svn -c -f - $SITE | brotli --quality=8 > $WORK_DIR/html-$BACKUP_DATE.tar.br \
+tar --exclude-backups --exclude=.svn -c -f - $SITE | brotli --quality=9 > $WORK_DIR/html-$BACKUP_DATE.tar.br \
     || { echo >&2 "tar command failed"; exit 1; }
 
 ME=`basename "$0"`
@@ -78,9 +80,9 @@ echo "echo Wordpress backup of $(date)" >> $WORK_DIR/install.sh
 echo "echo" >> $WORK_DIR/install.sh
 echo "rm -rf $SCRIPTPATH" >> $WORK_DIR/install.sh
 echo "echo Replacing database" >> $WORK_DIR/install.sh
-echo "brotli --decompress --input  ./database-$BACKUP_DATE.sql.br | mysql -u $DB_USER -p$DB_PASSWORD --host=$DB_HOST " >> $WORK_DIR/install.sh
+echo "brotli -d ./database-$BACKUP_DATE.sql.br | mysql -u $DB_USER -p$DB_PASSWORD --host=$DB_HOST " >> $WORK_DIR/install.sh
 echo "echo Replacing HTML" >> $WORK_DIR/install.sh
-echo "brotli --decompress --input ./html-$BACKUP_DATE.tar.br  | tar -x -f - --directory=$INSTALLPATH" >> $WORK_DIR/install.sh
+echo "brotli -d < ./html-$BACKUP_DATE.tar.br  | tar -x -f - --directory=$INSTALLPATH" >> $WORK_DIR/install.sh
 echo "echo Performing chown" >> $WORK_DIR/install.sh
 echo "chown -R www-data:www-data $SCRIPTPATH" >> $WORK_DIR/install.sh
 echo 'a2query >/dev/null 2>&1 || { echo >&2 "a2query not found, so apache installation is incomplete"; exit 1; }' >> $WORK_DIR/install.sh
@@ -93,9 +95,9 @@ echo 'fi' >> $WORK_DIR/install.sh
 
 cd $SAVED_DIR
 
-makeself $WORK_DIR $SITE-wordpress-$BACKUP_DATE.sh Wordpress-backup ./install.sh
+makeself $WORK_DIR $SITE_NAME-wordpress-$BACKUP_DATE.sh Wordpress-backup ./install.sh
 
-chmod go-rwx $SITE-wordpress-$BACKUP_DATE.sh
+chmod go-rwx $SITE_NAME-wordpress-$BACKUP_DATE.sh
 
 # TODO
 # add some option to automatically SCP this over
