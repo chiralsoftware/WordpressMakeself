@@ -80,7 +80,7 @@ echo "echo Wordpress backup of $(date)" >> $WORK_DIR/install.sh
 echo "echo" >> $WORK_DIR/install.sh
 echo "rm -rf $SCRIPTPATH" >> $WORK_DIR/install.sh
 echo "echo Replacing database" >> $WORK_DIR/install.sh
-echo "brotli --decompress --input ./database-$BACKUP_DATE.sql.br | mysql -u $DB_USER -p$DB_PASSWORD --host=$DB_HOST " >> $WORK_DIR/install.sh
+echo "brotli --decompress < ./database-$BACKUP_DATE.sql.br | mysql -u $DB_USER -p$DB_PASSWORD --host=$DB_HOST " >> $WORK_DIR/install.sh
 echo "echo Replacing HTML" >> $WORK_DIR/install.sh
 echo "brotli --decompress < ./html-$BACKUP_DATE.tar.br  | tar -x -f - --directory=$INSTALLPATH" >> $WORK_DIR/install.sh
 echo "echo Performing chown" >> $WORK_DIR/install.sh
