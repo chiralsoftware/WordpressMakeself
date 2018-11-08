@@ -36,8 +36,8 @@ trim() {
 }
 
 cd $SCRIPTPATH
-readarray LINES \
-	  <<< $({ cat wp-config.php; echo 'echo DB_USER . "\n" . DB_PASSWORD . "\n" . DB_HOST . "\n" . DB_NAME . "\n";'; } \
+readarray -t LINES \
+	  < <({ cat wp-config.php; echo 'echo DB_USER . "\n" . DB_PASSWORD . "\n" . DB_HOST . "\n" . DB_NAME . "\n";'; } \
 		    | php | sed '/^\s*$/d')
 
 DB_USER=$(trim ${LINES[0]})
