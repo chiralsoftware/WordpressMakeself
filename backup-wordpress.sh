@@ -53,7 +53,7 @@ SITE_NAME=$(mysql -B --skip-column-names -u $DB_USER -p$DB_PASSWORD --host=$DB_H
 
 echo mysql connection works
 
-mysqldump -u $DB_USER -p$DB_PASSWORD --host=$DB_HOST --add-drop-database --databases $DB_NAME | \
+mysqldump -u $DB_USER -p$DB_PASSWORD --host=$DB_HOST --no-tablespaces --add-drop-database --databases $DB_NAME | \
     brotli -c --quality=9 > $WORK_DIR/database-$BACKUP_DATE.sql.br \
     || { echo >&2 "mysqldump command failed"; exit 1; }
 
